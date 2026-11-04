@@ -1,6 +1,6 @@
 # Brainstorm Overview
 
-Last updated: 2026-11-02
+Last updated: 2026-11-04
 
 ## Sessions
 
@@ -14,6 +14,7 @@ Last updated: 2026-11-02
 | 06 | 2026-10-28 | inline-sidebar-rename | active | - | [#42](https://github.com/tals/corgi/issues/42) |
 | 07 | 2026-10-28 | agent-identity-color | active | - | [#44](https://github.com/tals/corgi/issues/44) |
 | 08 | 2026-11-02 | workspace-section-tint | active | - | - |
+| 09 | 2026-11-04 | custom-build | active | - | - |
 
 ## Open Threads
 - How `corgi voice --ssh host` reaches the remote daemon (socket forwarding vs stdio bridge) (from #01)
@@ -53,6 +54,14 @@ Last updated: 2026-11-02
 - Tint in the framed sidebar and scope header row (from #08)
 - Tint vs ghost row and glide animations (from #08)
 - Tint setting name and storage format (from #08)
+- Custom-build config file format and schema (from #09)
+- `--version` marker and verbose patch list format (from #09)
+- Whether upstream wants a Sentry tag for custom builds and how they interact with update channels (from #09)
+- Resolver command template contract: passing context, detecting success (from #09)
+- Retry limits and the "no changes outside conflicted files" check (from #09)
+- Configuring branch name and backup for several custom builds (from #09)
+- Migrating INTEGRATION.md and the integration-rebase skill onto the new script (from #09)
+- Handoff prompts for fork branches the user does not own (from #09)
 
 ## Parked Ideas
 - Voice glossary for domain vocabulary (#02)
