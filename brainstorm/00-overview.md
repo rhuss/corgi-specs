@@ -1,6 +1,6 @@
 # Brainstorm Overview
 
-Last updated: 2026-11-04
+Last updated: 2026-11-05
 
 ## Sessions
 
@@ -15,6 +15,7 @@ Last updated: 2026-11-04
 | 07 | 2026-10-28 | agent-identity-color | active | - | [#44](https://github.com/tals/corgi/issues/44) |
 | 08 | 2026-11-02 | workspace-section-tint | active | - | - |
 | 09 | 2026-11-04 | custom-build | active | - | - |
+| 10 | 2026-11-05 | bun-build-cleanup | idea | - | - |
 
 ## Open Threads
 - How `corgi voice --ssh host` reaches the remote daemon (socket forwarding vs stdio bridge) (from #01)
@@ -62,6 +63,10 @@ Last updated: 2026-11-04
 - Configuring branch name and backup for several custom builds (from #09)
 - Migrating INTEGRATION.md and the integration-rebase skill onto the new script (from #09)
 - Handoff prompts for fork branches the user does not own (from #09)
+- Why bun leaves the compile temp file behind, and whether a newer Bun fixes it (from #10)
+- Whether the `-dirty` check should ignore untracked files (from #10)
+- How to test that a build leaves no `.*.bun-build` file (from #10)
+- Whether to also ignore `.*.bun-build` in `.gitignore` (from #10)
 
 ## Parked Ideas
 - Voice glossary for domain vocabulary (#02)
