@@ -1,6 +1,6 @@
 # Brainstorm Overview
 
-Last updated: 2026-11-05
+Last updated: 2026-11-09
 
 ## Sessions
 
@@ -16,6 +16,7 @@ Last updated: 2026-11-05
 | 08 | 2026-11-02 | workspace-section-tint | active | - | - |
 | 09 | 2026-11-04 | custom-build | active | - | - |
 | 10 | 2026-11-05 | bun-build-cleanup | idea | - | - |
+| 11 | 2026-11-09 | aprofile-registry | active | - | - |
 
 ## Open Threads
 - How `corgi voice --ssh host` reaches the remote daemon (socket forwarding vs stdio bridge) (from #01)
@@ -67,6 +68,12 @@ Last updated: 2026-11-05
 - Whether the `-dirty` check should ignore untracked files (from #10)
 - How to test that a build leaves no `.*.bun-build` file (from #10)
 - Whether to also ignore `.*.bun-build` in `.gitignore` (from #10)
+- Extra launch arguments (resume, YOLO) passed through an aprofile wrapper (from #11)
+- Sign-in flow for a signed-out registry account: wrapper login or Corgi's own (from #11)
+- Whether a registry account still sets the config-folder variable itself (from #11)
+- Headless agents from registry accounts launching through the wrapper (from #11)
+- Pitch: aprofile-specific reader or "external account registries" (from #11)
+- Where the registry color Trick ships (Corgi examples or aprofile) (from #11)
 
 ## Parked Ideas
 - Voice glossary for domain vocabulary (#02)
