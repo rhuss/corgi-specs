@@ -83,6 +83,10 @@ Last updated: 2026-11-11
 - Which OpenShell sandbox paths survive stop/start, and should Corgi state live under `/workspace`? (from #12)
 - Should opening a stopped sandbox's workspace start it automatically or require an explicit action? (from #12)
 - How should Corgi distinguish OpenShell policy denials from gateway, authentication, and network failures? (from #12)
+- Does the OpenShell SDK expose enough metadata to tell an installed agent from one a provider supplies credentials for? (from #12)
+- What replaces SSH's second-connection recovery and separate data connection on the exec-stream transport? (from #12)
+- Second phase: one standard Corgi image or a per-project sandcast image? (from #12)
+- Second phase: is clone-in and push-out enough for long-lived sandboxes, or is syncing a local checkout wanted? (from #12)
 
 ## Parked Ideas
 - Voice glossary for domain vocabulary (#02)

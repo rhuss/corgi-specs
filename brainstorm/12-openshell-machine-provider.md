@@ -131,3 +131,76 @@ The command spelling is illustrative. The required outcome is attaching to a run
 - Should Corgi's agent account management be hidden inside OpenShell sandboxes, or mapped to OpenShell provider attachment and status commands?
 - Should a stopped sandbox start automatically when a user opens one of its workspaces, or always require an explicit start action?
 - How should Corgi distinguish OpenShell policy denials from gateway, authentication, and network failures in the machine header?
+
+---
+
+## Revisit: 2026-11-11
+
+### Updated Problem Framing
+
+The session started from three wishes: getting repositories and other state into a sandbox, running several agents in one sandbox, and tying sandbox lifecycle to Corgi's own management. Checking these against SSH machines as they exist on `upstream/main` showed that most of it needs no new design:
+
+- An SSH machine is a whole computer with its own daemon. It is not tied to a workspace or an agent. The daemon owns any number of workspaces, each with tabs and agents, so one machine already runs many agents.
+- A workspace belongs to exactly one machine.
+- The agent picker is already per machine. It uses the selected host's installed agents, accounts and models.
+- Corgi does nothing about repositories on a remote machine. A remote workspace is a folder that already exists there.
+- The machine must already exist before `corgi machine add`.
+
+An OpenShell machine on par with SSH therefore gives multiple agents per sandbox and a picker that reflects the sandbox for free. The scope was cut back to that.
+
+"Workspace" in this document always means a Corgi workspace (a folder with tabs and agents inside one machine). It is unrelated to OpenShell's workspaces.
+
+### New Approaches Considered
+
+#### A: SSH parity, attach only (chosen)
+
+Assume the sandbox is already running with Corgi, the bridge and the agent CLIs inside, as an SSH host already exists before it is added. Corgi attaches, shows its workspaces and agents, and reconnects. This is the first slice the original decision already described.
+
+- Pros: smallest change; mirrors a model users and the maintainer already know; multiple agents and the per-machine picker need no extra work; no provisioning, repository or teardown design is needed to ship it.
+- Cons: the user prepares the sandbox and clones repositories by hand; no per-task sandboxes from inside Corgi yet.
+
+#### B: Provisioning and repository setup in the first version
+
+Corgi creates sandboxes, clones repositories into them and manages their deletion from the start.
+
+- Pros: per-task sandboxes work end to end from the first release.
+- Cons: much larger first contribution; adds lifecycle, state and data-loss questions before the transport itself is proven upstream. Judged as overdoing it for a start.
+
+### Updated Decision
+
+Approach A. Build and pitch attach-only OpenShell machines on par with SSH machines. Approach B's content is kept below as a deferred second phase, not dropped.
+
+**Design principle (user):** follow the SSH machine design by default and do not bend it to fit OpenShell. Where OpenShell is fundamentally different from an SSH host, adapt that one part openly and name the difference, instead of forcing the SSH shape onto it or reshaping the shared design around OpenShell.
+
+**Fundamental differences known so far**, each a place where OpenShell machines deviate from SSH on purpose:
+
+- Installation: `machine add` installs or upgrades Corgi on an SSH host. A sandbox image is fixed, so a build mismatch is reported as incompatible and never repaired in place.
+- Trust: SSH relies on host keys and user authentication through OpenSSH. OpenShell relies on gateway authentication through the SDK. Neither model is relaxed for the other.
+- Credentials: on SSH, Corgi's guided sign-in runs on the remote host. In a sandbox, OpenShell providers supply credentials and Corgi's sign-in is hidden.
+- Lifecycle: an SSH host is reachable or not. A sandbox can also be provisioning, stopped or denied by policy, and these need their own states.
+- Connection handling: SSH machines use Corgi-owned OpenSSH masters, a separate data connection, and a second connection dialed beside a stalled one. The exec-stream transport needs its own equivalents; the SSH mechanics do not carry over as they are.
+
+Further differences found during specification or implementation are added to this list and handled the same way.
+
+### Deferred Second Phase
+
+Agreed with the user in this session, to be picked up after attach-only works:
+
+- Both sandbox lifetimes are wanted: short-lived per-task sandboxes, and long-lived ones that keep state and build caches.
+- A per-task sandbox is launched from a local workspace inside Corgi. Corgi creates the sandbox and it appears as its own machine.
+- The sandbox comes first, the agent second: the picker opens once the sandbox is up and asks its daemon what is installed. Corgi does not read agent metadata from an OCI image. The image may never be pulled locally and the gateway, not Corgi, holds the registry access.
+- A sandbox stays until the user removes it. It is never deleted on its own when work is pushed.
+
+My proposals from this session, not yet confirmed by the user in detail:
+
+- Repositories enter by clone from their remote at the local workspace's current branch, and leave by push. The sandbox never receives local files, and git credentials stay with OpenShell providers. Unpushed local commits are therefore absent in the sandbox.
+- Corgi remembers which sandboxes it created. Removing such a machine offers to delete the sandbox after listing unpushed commits and uncommitted files. Removing an attached sandbox only forgets the profile, as the original decision says.
+- In a long-lived sandbox, a new workspace can be created from a repository (taken from a local workspace or given by URL) and cloned into the persistent work directory. An existing clone is reused, with further branches as worktrees.
+- `.sandcast/manifest.yaml` in the local workspace may pre-fill the picker while a sandbox starts. The running daemon stays the authority.
+
+### Open Threads
+
+- Does the OpenShell SDK expose enough sandbox or profile metadata to tell "agent installed" from "agent installed and supplied with credentials by a provider"?
+- What replaces SSH's second-connection recovery and separate data connection on the exec-stream transport?
+- For the second phase: how does the user choose between one standard Corgi image and a per-project image built with sandcast?
+- For the second phase: is clone-in and push-out enough for long-lived sandboxes, or is some form of syncing a local checkout wanted? (asked, not answered)
