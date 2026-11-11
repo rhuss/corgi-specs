@@ -1,6 +1,6 @@
 # Brainstorm Overview
 
-Last updated: 2026-11-09
+Last updated: 2026-11-11
 
 ## Sessions
 
@@ -17,6 +17,7 @@ Last updated: 2026-11-09
 | 09 | 2026-11-04 | custom-build | active | - | - |
 | 10 | 2026-11-05 | bun-build-cleanup | idea | - | - |
 | 11 | 2026-11-09 | aprofile-registry | active | - | - |
+| 12 | 2026-11-11 | openshell-machine-provider | active | - | - |
 
 ## Open Threads
 - How `corgi voice --ssh host` reaches the remote daemon (socket forwarding vs stdio bridge) (from #01)
@@ -74,6 +75,14 @@ Last updated: 2026-11-09
 - Headless agents from registry accounts launching through the wrapper (from #11)
 - Pitch: aprofile-specific reader or "external account registries" (from #11)
 - Where the registry color Trick ships (Corgi examples or aprofile) (from #11)
+- Is a provider-neutral machine transport acceptable upstream, and is OpenShell a direction Corgi wants? (from #12)
+- Is a CLI-backed first implementation acceptable, or should Corgi speak directly to OpenShell's gRPC API? (from #12)
+- Is a sandbox the right Corgi machine boundary, or should an OpenShell gateway be the machine and its sandboxes become workspaces? (from #12)
+- Where should the Corgi sandbox image and protocol-pinned release live? (from #12)
+- Should Corgi-led agent account management remain available inside OpenShell sandboxes, or should OpenShell providers be the only credential source? (from #12)
+- Which OpenShell sandbox paths survive stop/start, and should Corgi state live under `/workspace`? (from #12)
+- Should opening a stopped sandbox's workspace start it automatically or require an explicit action? (from #12)
+- How should Corgi distinguish OpenShell policy denials from gateway, authentication, and network failures? (from #12)
 
 ## Parked Ideas
 - Voice glossary for domain vocabulary (#02)
