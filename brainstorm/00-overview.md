@@ -18,6 +18,7 @@ Last updated: 2026-11-11
 | 10 | 2026-11-05 | bun-build-cleanup | idea | - | - |
 | 11 | 2026-11-09 | aprofile-registry | active | - | - |
 | 12 | 2026-11-11 | openshell-machine-provider | active | - | - |
+| 13 | 2026-11-11 | standalone-patch-build-tool | active | - | - |
 
 ## Open Threads
 - How `corgi voice --ssh host` reaches the remote daemon (socket forwarding vs stdio bridge) (from #01)
@@ -87,6 +88,11 @@ Last updated: 2026-11-11
 - What replaces SSH's second-connection recovery and separate data connection on the exec-stream transport? (from #12)
 - Second phase: one standard Corgi image or a per-project sandcast image? (from #12)
 - Second phase: is clone-in and push-out enough for long-lived sandboxes, or is syncing a local checkout wanted? (from #12)
+- How fixes flow between #117 and the standalone tool while both evolve (manual port or sync script) (from #13)
+- Name for the standalone tool and a collision check (from #13)
+- Bun-compiled single binary vs a rewrite in Go or Rust (from #13)
+- Config format, and private vs team-shareable patch list (from #13)
+- Which of shared rerere, bisection, check caching and carry-commit mode go into v1 (from #13)
 
 ## Parked Ideas
 - Voice glossary for domain vocabulary (#02)
