@@ -10,9 +10,9 @@ This document is both the brainstorm record and the draft body for an upstream i
 
 **Maintainer question:** @tals, before I spend time on an implementation, would you be interested in this as a contribution?
 
-I would be happy to take it on if the direction fits Corgi. I am raising it as an issue first because it changes the remote-machine transport boundary, the saved machine catalog, and the relationship between Corgi and an external execution-control plane. If you would rather keep remote machines SSH-only for now, I will leave this as a design note.
+I would be happy to take it on if the direction fits Corgi. I would prototype it directly against OpenShell's official TypeScript API rather than shelling out to the OpenShell CLI. I am raising it as an issue first because it changes the remote-machine transport boundary, the saved machine catalog, and the relationship between Corgi and an external execution-control plane. If you would rather keep remote machines SSH-only for now, I will leave this as a design note.
 
-OpenShell is a policy-enforced runtime for autonomous agents, created by NVIDIA and now a CNCF project. It provides sandbox lifecycle, isolation policy, credential injection, provider management, and a gateway for local or remote sandboxes. Corgi already has remote machines over SSH: a daemon owns each machine's workspaces, panes, agents, terminal state, and reconnects, while one local viewer brings those machines together.
+OpenShell is a policy-enforced runtime for autonomous agents, created by NVIDIA and now a CNCF project. It provides sandbox lifecycle, isolation policy, credential injection, provider management, and a gateway for local or remote sandboxes. It also publishes an official TypeScript SDK, `@nvidia/openshell-sdk`, with sandbox lifecycle, interactive exec, forwarding, SSH, provider, and policy APIs. Corgi is already TypeScript on Bun, so the transport can use that API in-process instead of launching the OpenShell CLI. Corgi already has remote machines over SSH: a daemon owns each machine's workspaces, panes, agents, terminal state, and reconnects, while one local viewer brings those machines together.
 
 The fit is to keep that division of responsibility:
 
@@ -37,10 +37,10 @@ The chosen direction is a full OpenShell-native integration, not the generated-S
 
 ### A: OpenShell-native machine transport (chosen)
 
-Add an OpenShell machine kind with its own transport adapter. Use OpenShell's interactive exec stream to run Corgi's native bridge against the daemon socket inside the sandbox. OpenShell owns gateway authentication and sandbox lifecycle; Corgi owns the existing daemon protocol and viewer behavior.
+Add an OpenShell machine kind with its own transport adapter using `@nvidia/openshell-sdk`. Use the SDK's `execInteractive` stream to run Corgi's native bridge against the daemon socket inside the sandbox. OpenShell owns gateway authentication and sandbox lifecycle; Corgi owns the existing daemon protocol and viewer behavior.
 
-- Pros: preserves Corgi's PTY, hooks, workspace state, and reconnect model; no SSH alias or host-key exception; OpenShell errors and lifecycle can map cleanly to Corgi machine states; a typed CLI wrapper can be replaced by a direct gateway client later without changing the user model.
-- Cons: requires a shared machine transport boundary instead of the current SSH-only implementation; adds sandbox image and protocol-pinning work; introduces OpenShell as a runtime dependency for this machine kind.
+- Pros: preserves Corgi's PTY, hooks, workspace state, and reconnect model; no SSH alias, host-key exception, or CLI subprocess; both sides use typed TypeScript APIs; OpenShell errors and lifecycle can map cleanly to Corgi machine states.
+- Cons: requires a shared machine transport boundary instead of the current SSH-only implementation; adds sandbox image and protocol-pinning work; introduces OpenShell and its SDK as runtime dependencies for this machine kind; the SDK currently ships through GitHub Packages rather than the public npm registry.
 
 ### B: Generated OpenShell SSH alias
 
@@ -67,19 +67,19 @@ Approach A.
 
 The user explicitly chose the full OpenShell-native solution. One sandbox is one Corgi machine, with one daemon inside it. Corgi continues to render and coordinate the workspace; OpenShell remains the execution, policy, credential, and lifecycle boundary.
 
-The first implementation should use the interactive `openshell sandbox exec` stream to run the existing Corgi bridge, conceptually:
+The first implementation should use `execInteractive` from `@nvidia/openshell-sdk` to run the existing Corgi bridge, conceptually:
 
-```sh
-openshell sandbox exec \
-  --name "$SANDBOX" \
-  --no-tty \
-  --timeout 0 \
-  -- /usr/local/bin/corgi __remote-bridge "$CORGI_SOCKET"
+```ts
+const session = await client.sandbox.execInteractive(
+  sandbox,
+  ["/usr/local/bin/corgi", "__remote-bridge", socket],
+  { tty: false, timeoutSecs: 0 },
+);
 ```
 
-That stream carries stdin and stdout unchanged and lets the current link, input receipt, stream, retry, and reconnect behavior continue to work. A typed wrapper around the `openshell` CLI is the proposed first adapter because it leaves gateway authentication and token refresh in OpenShell's existing client. A direct gateway client can replace or supplement it later.
+The session exposes raw stdin, stdout, and stderr plus an exit status, which lets the current link, input receipt, stream, retry, and reconnect behavior continue to work. OIDC and gateway configuration come from the SDK's connection setup. A small adapter translates the SDK session to the duplex byte-stream interface Corgi's bridge already expects.
 
-The exact CLI spelling and direct-gateway choice remain open for maintainer feedback.
+The exact connection and authentication setup should follow the SDK's gateway configuration rather than duplicating the CLI's logic.
 
 ## Key Requirements
 
@@ -106,7 +106,7 @@ The exact CLI spelling and direct-gateway choice remain open for maintainer feed
 **My calls, subject to maintainer review:**
 
 - One sandbox, not one gateway, is the Corgi machine boundary.
-- The first version uses a typed `openshell` CLI wrapper instead of an embedded gRPC client.
+- The first version uses `@nvidia/openshell-sdk` directly; no OpenShell CLI process is involved.
 - Corgi-led account login is hidden for OpenShell machines at first; OpenShell providers or managed inference supply credentials.
 - Discovery imports selected sandboxes rather than mirroring every sandbox automatically.
 - The first version supports manual machine registration and attach before adding provisioning and full lifecycle controls.
@@ -123,7 +123,7 @@ The command spelling is illustrative. The required outcome is attaching to a run
 ## Open Questions
 
 - Is an OpenShell machine provider a direction Corgi wants, and is a provider-neutral machine transport acceptable?
-- Is a CLI-backed first implementation acceptable, or should the Corgi transport speak directly to OpenShell's gRPC API?
+- Is `@nvidia/openshell-sdk` acceptable as a Corgi dependency while it is distributed through GitHub Packages, or should Corgi wait for its public npm release?
 - Is a sandbox the right Corgi machine boundary, or should one OpenShell gateway be the machine and its sandboxes become workspaces?
 - Should the first version only attach to existing sandboxes, or also create and provision them from Corgi?
 - Where should the Corgi sandbox image live: the Corgi repository, Corgi release artifacts, or the OpenShell Community sandbox catalog?

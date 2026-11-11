@@ -76,7 +76,7 @@ Last updated: 2026-11-11
 - Pitch: aprofile-specific reader or "external account registries" (from #11)
 - Where the registry color Trick ships (Corgi examples or aprofile) (from #11)
 - Is a provider-neutral machine transport acceptable upstream, and is OpenShell a direction Corgi wants? (from #12)
-- Is a CLI-backed first implementation acceptable, or should Corgi speak directly to OpenShell's gRPC API? (from #12)
+- Is `@nvidia/openshell-sdk` acceptable as a Corgi dependency while it is distributed through GitHub Packages? (from #12)
 - Is a sandbox the right Corgi machine boundary, or should an OpenShell gateway be the machine and its sandboxes become workspaces? (from #12)
 - Where should the Corgi sandbox image and protocol-pinned release live? (from #12)
 - Should Corgi-led agent account management remain available inside OpenShell sandboxes, or should OpenShell providers be the only credential source? (from #12)
