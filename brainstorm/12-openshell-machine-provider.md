@@ -12,7 +12,7 @@ This document is both the brainstorm record and the draft body for an upstream i
 
 I would be happy to take it on if the direction fits Corgi. I am raising it as an issue first because it changes the remote-machine transport boundary, the saved machine catalog, and the relationship between Corgi and an external execution-control plane. If you would rather keep remote machines SSH-only for now, I will leave this as a design note.
 
-OpenShell is a policy-enforced runtime for autonomous agents. It provides sandbox lifecycle, isolation policy, credential injection, provider management, and a gateway for local or remote sandboxes. Corgi already has remote machines over SSH: a daemon owns each machine's workspaces, panes, agents, terminal state, and reconnects, while one local viewer brings those machines together.
+OpenShell is a policy-enforced runtime for autonomous agents, created by NVIDIA and now a CNCF project. It provides sandbox lifecycle, isolation policy, credential injection, provider management, and a gateway for local or remote sandboxes. Corgi already has remote machines over SSH: a daemon owns each machine's workspaces, panes, agents, terminal state, and reconnects, while one local viewer brings those machines together.
 
 The fit is to keep that division of responsibility:
 
